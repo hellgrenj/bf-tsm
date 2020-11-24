@@ -58,8 +58,8 @@ func (s *Server) optimalRoute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Printf("Received points %v\n", points)
-	if len(points) > 9 {
-		http.Error(w, "max 9 points allowed", http.StatusBadRequest)
+	if len(points) > 10 {
+		http.Error(w, "max 10 points allowed", http.StatusBadRequest)
 		return
 	}
 	start := time.Now()
