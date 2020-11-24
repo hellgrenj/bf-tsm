@@ -17,6 +17,7 @@
                 for (var i = 0; i < numberOfPoints; i++) {
                     randomPoints.push(getRandomPoint(colors.pop()))
                 }
+                
                 randomPoints.forEach(p => placePoint(ctx, p, p.label))
                 drawOptimalRoute(ctx, randomPoints)
             }
@@ -64,6 +65,9 @@
                 if (points[nextIndex]) {
                     ctx.moveTo(points[i].X, points[i].Y);
                     ctx.lineTo(points[nextIndex].X, points[nextIndex].Y);
+                } else { // close the loop
+                    ctx.moveTo(points[i].X, points[i].Y);
+                    ctx.lineTo(points[0].X, points[0].Y);
                 }
             }
             ctx.stroke();

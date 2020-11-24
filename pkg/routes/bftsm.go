@@ -68,6 +68,9 @@ func OptimalPath(points []Point) OptimalRoute {
 			if (i + 1) < len(points) {
 				// we can also include other factors besides distance to calculate the score...
 				pScore += int(points[i].Distance(points[i+1]))
+			} else {
+				// include the last leg.. going home..
+				pScore += int(points[i].Distance(points[0]))
 			}
 
 		}
