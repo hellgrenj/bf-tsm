@@ -7,22 +7,10 @@ import (
 	"github.com/hellgrenj/bf-tsm/pkg/routes"
 )
 
-func rearr(route []routes.Point, start routes.Point) []routes.Point {
-	var startIndex int
-	for i := range route {
-		if route[i].Label == start.Label {
-			startIndex = i
-		}
-	}
-	arr1 := route[startIndex:]
-	arr2 := route[:startIndex]
-	arr1 = append(arr1, arr2...)
-	return arr1
-}
 func prettyPrintRoute(route []routes.Point) {
 	for i, p := range route {
 		if i == len(route)-1 {
-			fmt.Printf("%v\n", p.Label)
+			fmt.Printf("%v => back to %v\n", p.Label, route[0].Label)
 		} else {
 			fmt.Printf("%v, ", p.Label)
 		}
@@ -52,7 +40,4 @@ func main() {
 	elapsed := time.Since(start)
 	fmt.Printf("calculated in %v milliseconds\n", elapsed.Milliseconds())
 
-	fmt.Printf("\nWhen starting from %v \n", berlin.Label)
-	r := rearr(optimal.Points, berlin)
-	prettyPrintRoute(r)
 }
