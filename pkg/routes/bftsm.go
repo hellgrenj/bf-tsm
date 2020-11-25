@@ -68,7 +68,7 @@ func OptimalPath(points []Point) OptimalRoute {
 	permutations := permutations(points)
 
 	fmt.Printf("\nNumber of permutations %v\n", len(permutations))
-	// calculate optimal route, in parallel if more then 3 000 000 permutations..
+	// calculate optimal route, in parallel if more then 300 000 permutations..
 	if len(permutations) > 300000 {
 		parallelOptimalRouteCalcStart := time.Now()
 		numberOfCores := runtime.NumCPU()
