@@ -12,7 +12,7 @@
             if (canvas.getContext) {
                 var ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                var colors = ['blue', 'yellow', 'pink', 'green', 'red', 'purple', 'orange']
+                var colors = ['blue', 'yellow', 'pink', 'lightgreen', 'red', 'purple', 'orange', 'lightblue', 'darkgreen', 'black', 'brown']
                 var randomPoints = []
                 for (var i = 0; i < numberOfPoints; i++) {
                     randomPoints.push(getRandomPoint(colors.pop()))

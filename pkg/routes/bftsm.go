@@ -70,6 +70,7 @@ func OptimalPath(points []Point) OptimalRoute {
 	fmt.Printf("\nNumber of permutations %v\n", len(permutations))
 	// calculate optimal route, in parallel if more then 3 000 000 permutations..
 	if len(permutations) > 300000 {
+		parallelOptimalRouteCalcStart := time.Now()
 		numberOfCores := runtime.NumCPU()
 		chunkSize := int(len(permutations) / numberOfCores)
 		fmt.Printf("\ndistributing the work over the %v CPU cores\n", numberOfCores)
@@ -98,31 +99,34 @@ func OptimalPath(points []Point) OptimalRoute {
 			finalPerms = append(finalPerms, o.Points)
 		}
 		fmt.Println("now running the candidates")
-		optimalRoute := optimalRoute(finalPerms)
+		optimalRoute := calculateOptimalRoute(finalPerms)
 		fmt.Printf("\nreturning the winner %v\n", optimalRoute)
 		optimalRoute.NoOfPermutations = len(permutations)
+		parallelOptimalRouteCalcTime := time.Since(parallelOptimalRouteCalcStart)
+		fmt.Printf("\n(parallel) optimal route calc took %v ms\n", parallelOptimalRouteCalcTime.Milliseconds())
 		return optimalRoute
 	}
 	// if fewer permutations run everything in this (one) go routine...
 	optimalRouteCalcStart := time.Now()
-	optimalRoute := optimalRoute(permutations)
+	optimalRoute := calculateOptimalRoute(permutations)
 	optimalRouteCalcTime := time.Since(optimalRouteCalcStart)
 	fmt.Printf("\noptimal route calc took %v ms\n", optimalRouteCalcTime.Milliseconds())
 	return optimalRoute
 }
 func parallelOptimalRoute(permutations [][]Point, ch chan OptimalRoute) {
-	or := optimalRoute(permutations)
+	or := calculateOptimalRoute(permutations)
 	ch <- or
 }
-func optimalRoute(permutations [][]Point) OptimalRoute {
+func calculateOptimalRoute(permutations [][]Point) OptimalRoute {
 	var optimalRoute OptimalRoute
 	for _, points := range permutations {
 
 		pScore := 0
 		for i := 0; i < len(points); i++ {
 
+			// we can also include other factors besides distance to calculate the score...
 			if (i + 1) < len(points) {
-				// we can also include other factors besides distance to calculate the score...
+
 				pScore += int(points[i].Distance(points[i+1]))
 			} else {
 				// include the last leg.. going home..

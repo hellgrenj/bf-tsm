@@ -39,5 +39,4 @@ func main() {
 	prettyPrintRoute(optimal.Points)
 	elapsed := time.Since(start)
 	fmt.Printf("calculated in %v milliseconds\n", elapsed.Milliseconds())
-
 }
