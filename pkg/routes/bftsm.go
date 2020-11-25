@@ -29,6 +29,7 @@ func (p Point) Distance(p2 Point) float64 {
 
 // Heaps Algorithm: https://en.wikipedia.org/wiki/Heap%27s_algorithm
 func permutations(arr []Point) [][]Point {
+	permExecStart := time.Now()
 	var generate func([]Point, int)
 	res := [][]Point{}
 
@@ -49,7 +50,10 @@ func permutations(arr []Point) [][]Point {
 		}
 	}
 	generate(arr, len(arr))
+	permExecTime := time.Since(permExecStart)
+	fmt.Printf("\ncalculating the permutations took %v ms\n", permExecTime.Milliseconds())
 	return res
+
 }
 
 // OptimalRoute contains the points, the score and the number of permutations compared
@@ -61,40 +65,31 @@ type OptimalRoute struct {
 
 // OptimalPath calculates and returns the optimal path
 func OptimalPath(points []Point) OptimalRoute {
-	permExecStart := time.Now()
 	permutations := permutations(points)
-	permExecTime := time.Since(permExecStart)
-	fmt.Printf("\npermutations took %v ms\n", permExecTime.Milliseconds())
 
-	// calculate optimal route, in parallel if more then 3 000 000 permutations..
 	fmt.Printf("\nNumber of permutations %v\n", len(permutations))
+	// calculate optimal route, in parallel if more then 3 000 000 permutations..
 	if len(permutations) > 300000 {
 		numberOfCores := runtime.NumCPU()
-		fmt.Printf("\nnumber of cores %v\n", numberOfCores)
 		chunkSize := int(len(permutations) / numberOfCores)
-		if numberOfCores > 100 {
-			numberOfCores = 100
-		}
-		var chans [100]chan OptimalRoute // set to big engough... (now only supports 100 cores.. :) )
+		fmt.Printf("\ndistributing the work over the %v CPU cores\n", numberOfCores)
+		var chans = make([]chan OptimalRoute, numberOfCores)
 		for i := 0; i < numberOfCores; i++ {
 			chans[i] = make(chan OptimalRoute)
 			if i == 0 {
-				fmt.Printf("\nfirst chunk take everything from 0 to chunkSize (i is %v, and chunkSize is %v\n", i, chunkSize)
 				// first chunk (take everything from 0 to chunkSize)
 				go parallelOptimalRoute(permutations[i:chunkSize], chans[i])
 			} else if i == (numberOfCores - 1) {
-				fmt.Printf("\nlast chunk (take all that is left...) (from index (chunkSize*i) which is %v\n", (chunkSize * i))
 				// last chunk (take all that is left...)
 				go parallelOptimalRoute(permutations[(chunkSize*i):], chans[i])
 			} else {
-				fmt.Printf("\nchunks inbetween start and end (chunkSize*(i) is %v, and chunkSize*(i+1) is %v\n", chunkSize*(i), chunkSize*(i+1))
 				// chunks inbetween start and end
 				go parallelOptimalRoute(permutations[(chunkSize*(i)):(chunkSize*(i+1))], chans[i])
 			}
 		}
 		fmt.Println("now waiting for all channels to return their batch result")
 		var optimalRoutes []OptimalRoute
-		for _, v := range chans[:numberOfCores] { // disregard unused nil channels...
+		for _, v := range chans {
 			or := <-v
 			optimalRoutes = append(optimalRoutes, or)
 		}
