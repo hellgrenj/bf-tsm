@@ -19,9 +19,9 @@ func NewPoint(l string, x float64, y float64) Point {
 	return Point{l, x, y}
 }
 
-// Distance finds the length of the hypotenuse between two points.
+// finds the length of the hypotenuse between two points.
 // Forumula is the square root of (x2 - x1)^2 + (y2 - y1)^2
-func (p Point) Distance(p2 Point) float64 {
+func (p Point) distance(p2 Point) float64 {
 	first := math.Pow(float64(p2.X-p.X), 2)
 	second := math.Pow(float64(p2.Y-p.Y), 2)
 	return math.Sqrt(first + second)
@@ -127,10 +127,10 @@ func calculateOptimalRoute(permutations [][]Point) OptimalRoute {
 			// we can also include other factors besides distance to calculate the score...
 			if (i + 1) < len(points) {
 
-				pScore += int(points[i].Distance(points[i+1]))
+				pScore += int(points[i].distance(points[i+1]))
 			} else {
 				// include the last leg.. going home..
-				pScore += int(points[i].Distance(points[0]))
+				pScore += int(points[i].distance(points[0]))
 			}
 
 		}
