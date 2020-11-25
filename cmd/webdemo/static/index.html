@@ -17,7 +17,7 @@
                 for (var i = 0; i < numberOfPoints; i++) {
                     randomPoints.push(getRandomPoint(colors.pop()))
                 }
-                
+
                 randomPoints.forEach(p => placePoint(ctx, p, p.label))
                 drawOptimalRoute(ctx, randomPoints)
             }
@@ -25,6 +25,11 @@
         }
         function drawOptimalRoute(ctx, points) {
             (async () => {
+                const button = document.querySelector('button')
+                button.disabled = true
+                document.getElementById("loadingInfo").innerHTML = " waiting on server ...."
+                document.getElementById("NoOfPermutations").innerHTML = ""
+                document.getElementById("executionTime").innerHTML = ""
                 const rawResponse = await fetch('http://localhost:1337/optimalroute', {
                     method: 'POST',
                     headers: {
@@ -38,6 +43,8 @@
                 document.getElementById("NoOfPermutations").innerHTML = content.NoOfPermutations;
                 document.getElementById("executionTime").innerHTML = content.ExecutionTimeInMs;
                 drawLineBetweenPoints(ctx, content.Route.Points)
+                button.disabled = false
+                document.getElementById("loadingInfo").innerHTML = ""
             })();
         }
 
@@ -81,9 +88,21 @@
 </head>
 
 <body>
-    <h2>brute force traveling salesman</h2>
+    <h2>brute force (parallelized) traveling salesman</h2>
+    <p>
+        click the button to randomly render x points on this 500x500 grid. <br/> the server will return the optimal route and some additional information. <br/>
+        the work of calculating the optimal route will be parallelized when there are more <br/> than 300 000 permutations (starting at 9 points.) 
+    </p>
+    <p>
+        On my macbook pro early 2015 i7 (3.1 GHz) 16GB: <br/>
+        7 points takes 3-4 milliseconds of server time. <br/>
+        9 points takes 220-270 milliseconds of server time. <br/>
+        10 points takes 2.2 - 2.8 seconds of server time. <br/>
+        11 points takes 75 - 115 seconds (<b>!</b>) of server time . <br/>
+        <b>Be patient if you crank it up to 11! :) </b>
+    </p>
     <canvas id="grid" width="500" height="500"></canvas>
-    <br/>
+    <br />
     <label for="number-of-points-select">Select number of points:</label>
     <select name="numberOfPoints" id="number-of-points-select">
         <option value="3">3</option>
@@ -94,11 +113,12 @@
         <option value="8">8</option>
         <option value="9">9</option>
         <option value="10">10</option>
+        <option value="11">11</option>
     </select>
-    <button id="renderButton" onclick="draw();" type="button">execute</button>
+    <button id="renderButton" onclick="draw();" type="button">execute</button><span id="loadingInfo"></span>
     <p>
-        number of permutations <span id="NoOfPermutations"></span><br/>
-        execution time (on the server) in milliseconds <span id="executionTime"></span>
+        number of permutations: <span style="font-weight: 600;" id="NoOfPermutations"></span><br />
+        execution time (on the server) in milliseconds: <span style="font-weight: 600;" id="executionTime"></span>
     </p>
 
 

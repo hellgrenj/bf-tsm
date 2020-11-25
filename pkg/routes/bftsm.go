@@ -1,7 +1,10 @@
 package routes
 
 import (
+	"fmt"
 	"math"
+	"runtime"
+	"time"
 )
 
 // Point represents a point in space.
@@ -58,7 +61,65 @@ type OptimalRoute struct {
 
 // OptimalPath calculates and returns the optimal path
 func OptimalPath(points []Point) OptimalRoute {
+	permExecStart := time.Now()
 	permutations := permutations(points)
+	permExecTime := time.Since(permExecStart)
+	fmt.Printf("\npermutations took %v ms\n", permExecTime.Milliseconds())
+
+	// calculate optimal route, in parallel if more then 3 000 000 permutations..
+	fmt.Printf("\nNumber of permutations %v\n", len(permutations))
+	if len(permutations) > 300000 {
+		numberOfCores := runtime.NumCPU()
+		fmt.Printf("\nnumber of cores %v\n", numberOfCores)
+		chunkSize := int(len(permutations) / numberOfCores)
+		if numberOfCores > 100 {
+			numberOfCores = 100
+		}
+		var chans [100]chan OptimalRoute // set to big engough... (now only supports 100 cores.. :) )
+		for i := 0; i < numberOfCores; i++ {
+			chans[i] = make(chan OptimalRoute)
+			if i == 0 {
+				fmt.Printf("\nfirst chunk take everything from 0 to chunkSize (i is %v, and chunkSize is %v\n", i, chunkSize)
+				// first chunk (take everything from 0 to chunkSize)
+				go parallelOptimalRoute(permutations[i:chunkSize], chans[i])
+			} else if i == (numberOfCores - 1) {
+				fmt.Printf("\nlast chunk (take all that is left...) (from index (chunkSize*i) which is %v\n", (chunkSize * i))
+				// last chunk (take all that is left...)
+				go parallelOptimalRoute(permutations[(chunkSize*i):], chans[i])
+			} else {
+				fmt.Printf("\nchunks inbetween start and end (chunkSize*(i) is %v, and chunkSize*(i+1) is %v\n", chunkSize*(i), chunkSize*(i+1))
+				// chunks inbetween start and end
+				go parallelOptimalRoute(permutations[(chunkSize*(i)):(chunkSize*(i+1))], chans[i])
+			}
+		}
+		fmt.Println("now waiting for all channels to return their batch result")
+		var optimalRoutes []OptimalRoute
+		for _, v := range chans[:numberOfCores] { // disregard unused nil channels...
+			or := <-v
+			optimalRoutes = append(optimalRoutes, or)
+		}
+		var finalPerms [][]Point
+		for _, o := range optimalRoutes {
+			finalPerms = append(finalPerms, o.Points)
+		}
+		fmt.Println("now running the candidates")
+		optimalRoute := optimalRoute(finalPerms)
+		fmt.Printf("\nreturning the winner %v\n", optimalRoute)
+		optimalRoute.NoOfPermutations = len(permutations)
+		return optimalRoute
+	}
+	// if fewer permutations run everything in this (one) go routine...
+	optimalRouteCalcStart := time.Now()
+	optimalRoute := optimalRoute(permutations)
+	optimalRouteCalcTime := time.Since(optimalRouteCalcStart)
+	fmt.Printf("\noptimal route calc took %v ms\n", optimalRouteCalcTime.Milliseconds())
+	return optimalRoute
+}
+func parallelOptimalRoute(permutations [][]Point, ch chan OptimalRoute) {
+	or := optimalRoute(permutations)
+	ch <- or
+}
+func optimalRoute(permutations [][]Point) OptimalRoute {
 	var optimalRoute OptimalRoute
 	for _, points := range permutations {
 
@@ -77,7 +138,6 @@ func OptimalPath(points []Point) OptimalRoute {
 		if pScore < optimalRoute.Score || optimalRoute.Score == 0 {
 			optimalRoute = OptimalRoute{Points: points, Score: pScore, NoOfPermutations: len(permutations)}
 		}
-
 	}
 	return optimalRoute
 }

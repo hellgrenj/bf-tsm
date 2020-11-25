@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -58,8 +59,8 @@ func (s *Server) optimalRoute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Printf("Received points %v\n", points)
-	if len(points) > 10 {
-		http.Error(w, "max 10 points allowed", http.StatusBadRequest)
+	if len(points) > 11 {
+		http.Error(w, "max 11 points allowed", http.StatusBadRequest)
 		return
 	}
 	start := time.Now()
@@ -95,6 +96,12 @@ func NewServer() *Server {
 }
 
 func main() {
+	defer func() { //catch or finally
+		if err := recover(); err != nil { //catch
+			fmt.Fprintf(os.Stderr, "Exception: %v\n", err)
+			os.Exit(1)
+		}
+	}()
 	s := NewServer()
 	fmt.Println("webdemo running on localhost:1337")
 	http.ListenAndServe(":1337", s)
