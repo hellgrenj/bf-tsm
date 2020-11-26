@@ -33,7 +33,7 @@ func main() {
 	arr := []routes.Point{amsterdam, kiruna, johannesburg, havana, chicago, goteborg, berlin, newyork, manilla}
 	optimal := routes.OptimalPath(arr)
 	fmt.Printf("\n%v cities", len(arr))
-	fmt.Printf("\n%v permutations", optimal.NoOfPermutations)
+	fmt.Printf("\n%v permutations", optimal.NumberOfPermutations)
 	fmt.Printf("\nlowest cost %v\n", optimal.Cost)
 	fmt.Printf("the optimal route is:")
 	prettyPrintRoute(optimal.Points)

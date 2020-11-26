@@ -39,7 +39,7 @@ func TestOptimalPath(t *testing.T) {
 	if optimal.Points[6].Label != "New york" {
 		t.Errorf("Expected the last Point (before going back home) to be Havana but it was %v", optimal.Points[6].Label)
 	}
-	if optimal.NoOfPermutations != 5040 { // 7 points or cities
-		t.Errorf("Expected number of permuations to be 5040 but it was %v", optimal.NoOfPermutations)
+	if optimal.NumberOfPermutations != 5040 { // 7 points or cities
+		t.Errorf("Expected number of permuations to be 5040 but it was %v", optimal.NumberOfPermutations)
 	}
 }

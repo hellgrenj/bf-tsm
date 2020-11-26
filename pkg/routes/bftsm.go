@@ -14,7 +14,7 @@ type Point struct {
 	Y     float64
 }
 
-// NewPoint returns a Point based on X and Y positions on a graph.
+// NewPoint returns a Point with a label based on X and Y positions on a graph.
 func NewPoint(l string, x float64, y float64) Point {
 	return Point{l, x, y}
 }
@@ -30,7 +30,7 @@ func (p Point) distance(p2 Point) float64 {
 // Heaps Algorithm: https://en.wikipedia.org/wiki/Heap%27s_algorithm
 func permutations(arr []Point) [][]Point {
 	permExecStart := time.Now()
-	defer func() { 
+	defer func() {
 		permExecTime := time.Since(permExecStart)
 		fmt.Printf("\ncalculating the permutations took %v ms\n", permExecTime.Milliseconds())
 	}()
@@ -61,9 +61,9 @@ func permutations(arr []Point) [][]Point {
 
 // OptimalRoute contains the points, the cost and the number of permutations compared
 type OptimalRoute struct {
-	Points           []Point
-	Cost            int
-	NoOfPermutations int
+	Points               []Point
+	Cost                 int
+	NumberOfPermutations int
 }
 
 // OptimalPath calculates and returns the optimal path
@@ -104,7 +104,7 @@ func OptimalPath(points []Point) OptimalRoute {
 		fmt.Println("now running the candidates")
 		optimalRoute := calculateOptimalRoute(finalPerms)
 		fmt.Printf("\nreturning the winner %v\n", optimalRoute)
-		optimalRoute.NoOfPermutations = len(permutations)
+		optimalRoute.NumberOfPermutations = len(permutations)
 		parallelOptimalRouteCalcTime := time.Since(parallelOptimalRouteCalcStart)
 		fmt.Printf("\n(parallel) optimal route calc took %v ms\n", parallelOptimalRouteCalcTime.Milliseconds())
 		return optimalRoute
@@ -117,14 +117,14 @@ func OptimalPath(points []Point) OptimalRoute {
 	return optimalRoute
 }
 func parallelOptimalRoute(permutations [][]Point, ch chan OptimalRoute) {
-	or := calculateOptimalRoute(permutations)
-	ch <- or
+	optimalRoute := calculateOptimalRoute(permutations)
+	ch <- optimalRoute
 }
 func calculateOptimalRoute(permutations [][]Point) OptimalRoute {
 	var optimalRoute OptimalRoute
 	for _, points := range permutations {
 		cost := 0
-		for i:= range points{
+		for i := range points {
 			// we can also include other factors besides distance to calculate the cost...
 			if (i + 1) < len(points) {
 				cost += int(points[i].distance(points[i+1]))
@@ -134,7 +134,7 @@ func calculateOptimalRoute(permutations [][]Point) OptimalRoute {
 			}
 		}
 		if cost < optimalRoute.Cost || optimalRoute.Cost == 0 {
-			optimalRoute = OptimalRoute{Points: points, Cost: cost, NoOfPermutations: len(permutations)}
+			optimalRoute = OptimalRoute{Points: points, Cost: cost, NumberOfPermutations: len(permutations)}
 		}
 	}
 	return optimalRoute

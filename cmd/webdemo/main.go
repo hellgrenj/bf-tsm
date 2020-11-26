@@ -46,9 +46,9 @@ func (s *Server) decode(w http.ResponseWriter, r *http.Request, v interface{}) e
 
 // Result conains the optimal route and the time it took to calculate this route
 type Result struct {
-	Route             routes.OptimalRoute
-	NoOfPermutations  int
-	ExecutionTimeInMs int64
+	Route                routes.OptimalRoute
+	NumberOfPermutations int
+	ExecutionTimeInMs    int64
 }
 
 func (s *Server) optimalRoute(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +67,7 @@ func (s *Server) optimalRoute(w http.ResponseWriter, r *http.Request) {
 	optimal := routes.OptimalPath(points)
 	elapsed := time.Since(start)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(&Result{Route: optimal, NoOfPermutations: optimal.NoOfPermutations, ExecutionTimeInMs: elapsed.Milliseconds()})
+	json.NewEncoder(w).Encode(&Result{Route: optimal, NumberOfPermutations: optimal.NumberOfPermutations, ExecutionTimeInMs: elapsed.Milliseconds()})
 
 }
 

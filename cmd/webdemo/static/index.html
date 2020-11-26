@@ -28,7 +28,7 @@
                 const button = document.querySelector('button')
                 button.disabled = true
                 document.getElementById("loadingInfo").innerHTML = " waiting on server ...."
-                document.getElementById("NoOfPermutations").innerHTML = ""
+                document.getElementById("NumberOfPermutations").innerHTML = ""
                 document.getElementById("executionTime").innerHTML = ""
                 const rawResponse = await fetch('http://localhost:1337/optimalroute', {
                     method: 'POST',
@@ -40,7 +40,7 @@
                 });
                 const content = await rawResponse.json();
                 console.log(content);
-                document.getElementById("NoOfPermutations").innerHTML = content.NoOfPermutations;
+                document.getElementById("NumberOfPermutations").innerHTML = content.NumberOfPermutations;
                 document.getElementById("executionTime").innerHTML = content.ExecutionTimeInMs;
                 drawLineBetweenPoints(ctx, content.Route.Points)
                 button.disabled = false
@@ -120,7 +120,7 @@
     </select>
     <button id="renderButton" onclick="draw();" type="button">execute</button><span id="loadingInfo"></span>
     <p>
-        number of permutations: <span style="font-weight: 600;" id="NoOfPermutations"></span><br />
+        number of permutations: <span style="font-weight: 600;" id="NumberOfPermutations"></span><br />
         execution time (on the server) in milliseconds: <span style="font-weight: 600;" id="executionTime"></span>
     </p>
 
