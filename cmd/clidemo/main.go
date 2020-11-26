@@ -34,7 +34,7 @@ func main() {
 	optimal := routes.OptimalPath(arr)
 	fmt.Printf("\n%v cities", len(arr))
 	fmt.Printf("\n%v permutations", optimal.NoOfPermutations)
-	fmt.Printf("\nlowest score %v\n", optimal.Score)
+	fmt.Printf("\nlowest cost %v\n", optimal.Cost)
 	fmt.Printf("the optimal route is:")
 	prettyPrintRoute(optimal.Points)
 	elapsed := time.Since(start)

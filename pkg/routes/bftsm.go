@@ -30,6 +30,10 @@ func (p Point) distance(p2 Point) float64 {
 // Heaps Algorithm: https://en.wikipedia.org/wiki/Heap%27s_algorithm
 func permutations(arr []Point) [][]Point {
 	permExecStart := time.Now()
+	defer func() { 
+		permExecTime := time.Since(permExecStart)
+		fmt.Printf("\ncalculating the permutations took %v ms\n", permExecTime.Milliseconds())
+	}()
 	var generate func([]Point, int)
 	res := [][]Point{}
 
@@ -50,16 +54,15 @@ func permutations(arr []Point) [][]Point {
 		}
 	}
 	generate(arr, len(arr))
-	permExecTime := time.Since(permExecStart)
-	fmt.Printf("\ncalculating the permutations took %v ms\n", permExecTime.Milliseconds())
+
 	return res
 
 }
 
-// OptimalRoute contains the points, the score and the number of permutations compared
+// OptimalRoute contains the points, the cost and the number of permutations compared
 type OptimalRoute struct {
 	Points           []Point
-	Score            int
+	Cost            int
 	NoOfPermutations int
 }
 
@@ -120,22 +123,18 @@ func parallelOptimalRoute(permutations [][]Point, ch chan OptimalRoute) {
 func calculateOptimalRoute(permutations [][]Point) OptimalRoute {
 	var optimalRoute OptimalRoute
 	for _, points := range permutations {
-
-		pScore := 0
-		for i := 0; i < len(points); i++ {
-
-			// we can also include other factors besides distance to calculate the score...
+		cost := 0
+		for i:= range points{
+			// we can also include other factors besides distance to calculate the cost...
 			if (i + 1) < len(points) {
-
-				pScore += int(points[i].distance(points[i+1]))
+				cost += int(points[i].distance(points[i+1]))
 			} else {
 				// include the last leg.. going home..
-				pScore += int(points[i].distance(points[0]))
+				cost += int(points[i].distance(points[0]))
 			}
-
 		}
-		if pScore < optimalRoute.Score || optimalRoute.Score == 0 {
-			optimalRoute = OptimalRoute{Points: points, Score: pScore, NoOfPermutations: len(permutations)}
+		if cost < optimalRoute.Cost || optimalRoute.Cost == 0 {
+			optimalRoute = OptimalRoute{Points: points, Cost: cost, NoOfPermutations: len(permutations)}
 		}
 	}
 	return optimalRoute
