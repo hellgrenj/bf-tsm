@@ -24,6 +24,8 @@ FROM alpine:3.11 as runtime
 
 # copy only executable from build step
 COPY --from=builder ./app/main main
-COPY --from=builder ./app/cmd/webdemo/static ./static
+RUN ls -la
+COPY --from=builder ./app/cmd/webdemo/static static
+
 # Command to run the executable
 CMD ["./main"]
