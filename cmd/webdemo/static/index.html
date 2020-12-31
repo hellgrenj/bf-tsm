@@ -30,7 +30,7 @@
                 document.getElementById("loadingInfo").innerHTML = " waiting on server ...."
                 document.getElementById("NumberOfPermutations").innerHTML = ""
                 document.getElementById("executionTime").innerHTML = ""
-                const rawResponse = await fetch('http://localhost:1337/optimalroute', {
+                const rawResponse = await fetch('/optimalroute', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
