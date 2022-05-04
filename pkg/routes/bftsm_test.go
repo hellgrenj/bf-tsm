@@ -43,3 +43,17 @@ func TestOptimalPath(t *testing.T) {
 		t.Errorf("Expected number of permuations to be 5040 but it was %v", optimal.NumberOfPermutations)
 	}
 }
+
+func BenchmarkOptimalPath(b *testing.B) {
+	amsterdam := routes.NewPoint("Amsterdam", 52.377956, 4.897070)
+	berlin := routes.NewPoint("Berlin", 52.520008, 13.404954)
+	kiruna := routes.NewPoint("Kiruna", 67.85000, 20.23000)
+	goteborg := routes.NewPoint("Göteborg", 57.69000, 11.89000)
+	johannesburg := routes.NewPoint("Johannes Burg", -26.195246, 28.034088)
+	newyork := routes.NewPoint("New york", 40.730610, -73.935242)
+
+	for i := 0; i < b.N; i++ {
+		arr := []routes.Point{amsterdam, kiruna, berlin, goteborg, johannesburg, newyork}
+		routes.OptimalPath(arr)
+	}
+}
