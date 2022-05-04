@@ -1,12 +1,29 @@
 package routes_test
 
 import (
+	"log"
+	"os"
 	"testing"
 
 	"github.com/hellgrenj/bf-tsm/pkg/routes"
 )
 
+func quiet() func() {
+	null, _ := os.Open(os.DevNull)
+	sout := os.Stdout
+	serr := os.Stderr
+	os.Stdout = null
+	os.Stderr = null
+	log.SetOutput(null)
+	return func() {
+		defer null.Close()
+		os.Stdout = sout
+		os.Stderr = serr
+		log.SetOutput(os.Stderr)
+	}
+}
 func TestOptimalPath(t *testing.T) {
+	defer quiet()()
 	amsterdam := routes.NewPoint("Amsterdam", 52.377956, 4.897070)
 	berlin := routes.NewPoint("Berlin", 52.520008, 13.404954)
 	kiruna := routes.NewPoint("Kiruna", 67.85000, 20.23000)
@@ -45,6 +62,7 @@ func TestOptimalPath(t *testing.T) {
 }
 
 func BenchmarkOptimalPath(b *testing.B) {
+	defer quiet()()
 	amsterdam := routes.NewPoint("Amsterdam", 52.377956, 4.897070)
 	berlin := routes.NewPoint("Berlin", 52.520008, 13.404954)
 	kiruna := routes.NewPoint("Kiruna", 67.85000, 20.23000)
